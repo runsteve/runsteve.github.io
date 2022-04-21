@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+  <meta charset="UTF-8">
+  <meta 
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta 
+    http-equiv="X-UA-Compatible" 
+    content="ie=edge">
+  <meta 
+    name="theme-color" 
+    content="#fff" 
+    id="theme-color">
+  <meta 
+    name="description" 
+    content="先斩了再说">
+  <link 
+    rel="icon" 
+    href="https://ae01.alicdn.com/kf/Hfc15e2de394f4203a01a141c6889ad9a3.png">
+  <title>C++编程思想笔记 分析和设计</title>
+  
+    
+      <meta 
+        property="og:title" 
+        content="C++编程思想笔记 分析和设计">
+    
+    
+      <meta 
+        property="og:url" 
+        content="https://runsteve.github.io/2022/04/21/C++%E7%BC%96%E7%A8%8B%E6%80%9D%E6%83%B3%E7%AC%94%E8%AE%B0%20%E5%88%86%E6%9E%90%E5%92%8C%E8%AE%BE%E8%AE%A1/index.html">
+    
+    
+      <meta 
+        property="og:img" 
+        content="https://inews.gtimg.com/newsapp_ls/0/14780936088/0.jiketuchuang.png">
+    
+    
+      <meta 
+        property="og:img" 
+        content="先斩了再说">
+    
+    
+      <meta 
+        property="og:type" 
+        content="article">
+      <meta 
+        property="og:article:published_time" 
+        content="2022-04-21">
+      <meta 
+        property="og:article:modified_time" 
+        content="2022-04-21">
+      <meta 
+        property="og:article:author" 
+        content="墨樱">
+      
+        
+          <meta 
+            property="og:article:tag" 
+            content="C++">
+        
+          <meta 
+            property="og:article:tag" 
+            content="面向对象">
+        
+      
+    
+  
+  <script>
+    function loadScript(url, cb) {
+      var script = document.createElement('script');
+      script.src = url;
+      if (cb) script.onload = cb;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+    function loadCSS(href, data, attr) {
+      var sheet = document.createElement('link');
+      sheet.ref = 'stylesheet';
+      sheet.href = href;
+      sheet.dataset[data] = attr;
+      document.head.appendChild(sheet);
+    }
+    function changeCSS(cssFile, data, attr) {
+      var oldlink = document.querySelector(data);
+      var newlink = document.createElement("link");
+      newlink.setAttribute("rel", "stylesheet");
+      newlink.setAttribute("href", cssFile);
+      newlink.dataset.prism = attr;
+      document.head.replaceChild(newlink, oldlink);
+    }
+  </script>
+  
+    
+  
+  <script>
+    // control reverse button
+    var reverseDarkList = {
+      dark: 'light',
+      light: 'dark'
+    };
+    var themeColor = {
+      dark: '#1c1c1e',
+      light: '#fff'
+    }
+    // get the data of css prefers-color-scheme
+    var getCssMediaQuery = function() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+    // reverse current darkmode setting function
+    var reverseDarkModeSetting = function() {
+      var setting = localStorage.getItem('user-color-scheme');
+      if(reverseDarkList[setting]) {
+        setting = reverseDarkList[setting];
+      } else if(setting === null) {
+        setting = reverseDarkList[getCssMediaQuery()];
+      } else {
+        return;
+      }
+      localStorage.setItem('user-color-scheme', setting);
+      return setting;
+    };
+    // apply current darkmode setting
+  </script>
+  
+    <script>
+      var setDarkmode = function(mode) {
+      var setting = mode || localStorage.getItem('user-color-scheme');
+      if(setting === getCssMediaQuery()) {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[setting];
+        document.getElementById('theme-color').dataset.mode = setting;
+      } else if(reverseDarkList[setting]) {
+        document.documentElement.setAttribute('data-user-color-scheme', setting);
+        document.getElementById('theme-color').content = themeColor[setting];
+        document.getElementById('theme-color').dataset.mode = setting;
+      } else {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[getCssMediaQuery()];
+        document.getElementById('theme-color').dataset.mode = getCssMediaQuery();
+      }
+    };
+    setDarkmode();
+    </script>
+  
+  
+  <link rel="preload" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css" as="style" >
+  <link rel="preload" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css" as="style" >
+  
+  
+    <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.js" as="script">
+    <link rel="preload" href="/js/lib/lightbox/baguetteBox.min.css" as="style" >
+  
+  
+    <link rel="preload" href="/js/lib/lozad.min.js" as="script">
+  
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css">
+  
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css">
+  
+    <link rel="stylesheet" href="/js/lib/lightbox/baguetteBox.min.css">
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+  <body>
+    <div class="wrapper">
+       
+      <nav class="navbar">
+  <div class="navbar-logo">
+    <span class="navbar-logo-main">
+      
+        <img 
+          class="navbar-logo-img"
+          width="32"
+          height="32"
+          src="https://ae01.alicdn.com/kf/Hfc15e2de394f4203a01a141c6889ad9a3.png" 
+          alt="blog logo">
+      
+      <span class="navbar-logo-dsc">墨樱's blog</span>
+    </span>
+  </div>
+  <div class="navbar-menu">
+    
+      <a 
+        href="/" 
+        class="navbar-menu-item">
+        
+          首页
+        
+      </a>
+    
+      <a 
+        href="/archives" 
+        class="navbar-menu-item">
+        
+          归档
+        
+      </a>
+    
+      <a 
+        href="/tags" 
+        class="navbar-menu-item">
+        
+          标签
+        
+      </a>
+    
+      <a 
+        href="/categories" 
+        class="navbar-menu-item">
+        
+          分类
+        
+      </a>
+    
+      <a 
+        href="/about" 
+        class="navbar-menu-item">
+        
+          关于
+        
+      </a>
+    
+      <a 
+        href="/links" 
+        class="navbar-menu-item">
+        
+          友链
+        
+      </a>
+    
+    <a 
+      class="navbar-menu-item darknavbar" 
+      id="dark">
+      <i class="iconfont icon-weather"></i>
+    </a>
+    <a 
+      class="navbar-menu-item searchnavbar" 
+      id="search">
+      <i 
+        class="iconfont icon-search" 
+        style="font-size: 1.2rem; font-weight: 400;">
+      </i>
+    </a>
+  </div>
+</nav> 
+      
+      <div 
+        id="local-search" 
+        style="display: none">
+        <input
+          class="navbar-menu-item"
+          id="search-input"
+          placeholder="请输入搜索内容..." />
+        <div id="search-content"></div>
+      </div>
+      
+      <div class="section-wrap">
+        <div class="container">
+          <div class="columns">
+            <main class="main-column">
+  <div class="image-wrapper">
+    <img 
+      src="https://inews.gtimg.com/newsapp_ls/0/14780936088/0.jiketuchuang.png" 
+      data-src="https://inews.gtimg.com/newsapp_ls/0/14780936088/0.jiketuchuang.png"
+      srcset="data:image/svg+xml,%3Csvg%20xmlns=&#39;http://www.w3.org/2000/svg&#39;%20viewBox=&#39;0%200%20300%20300&#39;%3E%3C/svg%3E"
+      class="image lozad"
+      alt="C++编程思想笔记 分析和设计 thumbnail">
+  </div>
+
+<article class="card card-content">
+  <header>
+    <h1 class="post-title">
+      C++编程思想笔记 分析和设计
+    </h1>
+  </header>
+  <div class="post-meta post-show-meta">
+    <time datetime="2022-04-21T10:55:17.504Z">
+      <i 
+        class="iconfont icon-calendar" 
+        style="margin-right: 2px;">
+      </i>
+      <span>2022-04-21</span>
+    </time>
+    
+    
+      <span class="dot"></span>
+      <span>870 字</span>
+    
+  </div>
+  
+    <div 
+      class="post-meta post-show-meta" 
+      style="margin-top: -10px;">
+      <div style="display: flex; align-items: center;">
+        <i 
+          class="iconfont icon-biaoqian" 
+          style="margin-right: 2px; font-size: 1.15rem;">
+        </i>
+        
+          
+          <a 
+            href="/tags/C/" 
+            class="post-meta-link">
+            C++
+          </a>
+        
+          
+            <span class="dot"></span>
+          
+          <a 
+            href="/tags/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" 
+            class="post-meta-link">
+            面向对象
+          </a>
+        
+      </div>
+    </div>
+  
+  </header>
+  <div 
+    id="section" 
+    class="post-content">
+    <h1 id="C-编程思想笔记-分析和设计"><a href="#C-编程思想笔记-分析和设计" class="headerlink" title="C++编程思想笔记 分析和设计"></a>C++编程思想笔记 分析和设计</h1><p>产品开发也是风险管理，较早地确定一个方法是否可行。<br>产品开发最少信息：<br>1.有哪些对象（如何将项目分成多个组成部分<br>2.他们的接口是什么（需要向每个对象发送什么信息）<br>整个过程分为5个阶段</p>
+<h2 id="第0阶段-制定计划"><a href="#第0阶段-制定计划" class="headerlink" title="第0阶段 制定计划"></a>第0阶段 制定计划</h2><p>首先确定过程应当有哪些步骤，进行任务陈述，设计高层概念，如“塔楼程序跟踪飞机”</p>
+<h2 id="第1阶段-我们在做什么"><a href="#第1阶段-我们在做什么" class="headerlink" title="第1阶段 我们在做什么"></a>第1阶段 我们在做什么</h2><p>把注意力放在核心问题上，展示用例（use case）,回答：</p>
+<ol>
+<li>谁将使用这个系统，</li>
+<li>执行者用这个系统做什么，</li>
+<li>执行者如何用这个系统工作，</li>
+<li>如果其他人也做这件事，或者同一个执行者又不同的目标，该怎么办（揭示变化）</li>
+<li>当使用这个系统时，会发生什么问题（揭示异常）</li>
+</ol>
+<p>用例不必复杂（以用户角度）<br>也可以通过动词和名词来近似描述<br>估算时间</p>
+<h2 id="第二阶段-我们将如何建立对象"><a href="#第二阶段-我们将如何建立对象" class="headerlink" title="第二阶段 我们将如何建立对象"></a>第二阶段 我们将如何建立对象</h2><p>CRC卡片法<br>在卡片上写</p>
+<ol>
+<li>类的名字</li>
+<li>类的职责</li>
+<li>类的协同 与其他类有哪些交互</li>
+</ol>
+<p>CRC的目的是找到总体概念 不要太复杂</p>
+<h3 id="对象设计的五个阶段"><a href="#对象设计的五个阶段" class="headerlink" title="对象设计的五个阶段"></a>对象设计的五个阶段</h3><ol>
+<li>对象发现 最早期设计的对象</li>
+<li>对象装配 设计对象时需要新增的内部对象</li>
+<li>系统构造 对象通信，互相连接时的需要，可以改变已有的类或要求新类 如一个链表 ，只有帮助其他类的功能</li>
+<li>系统扩充 向系统添加新的性能 如果先前架构不合要求，可以重新构造部分系统</li>
+<li>对象重用 对类真正的强度测试</li>
+</ol>
+<h3 id="对象开发的五个准测"><a href="#对象开发的五个准测" class="headerlink" title="对象开发的五个准测"></a>对象开发的五个准测</h3><ol>
+<li>让特定问题生成一个类，在解决其他问题期间让这个类生长和成熟</li>
+<li>记住，发现所需要的类（和接口）是设计系统的主要内容</li>
+<li>不要强迫自己在一开始就知道每一件事情，应当不断学习</li>
+<li>开始编程，让一些部分能够运行，这样就能证明和否定已生成的设计。坏的类不会破坏好的类</li>
+<li>尽量保持简单，运用occam razor方法，从小和简单的类开始</li>
+</ol>
+<h2 id="第3阶段：创建核心"><a href="#第3阶段：创建核心" class="headerlink" title="第3阶段：创建核心"></a>第3阶段：创建核心</h2><p>从粗线条设计向可执行代码体的最初转换阶段（多次反复）<br>实现系统体系结构的核心，创建框架，完成第一次系统集成和测试，向客户提出反馈意见，暴露问题，确保测试结果和需求用例符合。系统稳定后，添加更多功能</p>
+<h2 id="第4阶段-迭代用例"><a href="#第4阶段-迭代用例" class="headerlink" title="第4阶段 迭代用例"></a>第4阶段 迭代用例</h2><p>一次迭代期间，增加一组特征，每一组特征本身就是一个小项目。<br>迭代的基础：一个用例。每一个用例就是一组相关功能。达到目标功能，或客户满意，停止迭代。</p>
+<h2 id="第5阶段：进化-（维护）"><a href="#第5阶段：进化-（维护）" class="headerlink" title="第5阶段：进化 （维护）"></a>第5阶段：进化 （维护）</h2><p>让程序更好，直到软件变正确<br>按默认情况，如果修改了一个类，则它的超类和子类都仍然正常工作。（特别是有内部的一组单元测试，验证了修改的正确性）修改结果的任何改变都将限定于子类和被改变的类的协同者</p>
+
+  </div>
+  <div>
+    
+      <div 
+        class="post-note note-warning copyright" 
+        style="margin-top: 42px">
+        <p>
+          <span style="font-weight: bold;">作者：</span><a 
+            target="_blank" 
+            rel="nofollow noopener noreferrer" 
+            href="/about">
+            墨樱
+          </a>
+        </p>
+        <p>
+          <span style="font-weight: bold;">文章链接：</span><a 
+            target="_blank" 
+            rel="nofollow noopener noreferrer" 
+            href="https://runsteve.github.io/2022/04/21/C++%E7%BC%96%E7%A8%8B%E6%80%9D%E6%83%B3%E7%AC%94%E8%AE%B0%20%E5%88%86%E6%9E%90%E5%92%8C%E8%AE%BE%E8%AE%A1/">
+            https://runsteve.github.io/2022/04/21/C++%E7%BC%96%E7%A8%8B%E6%80%9D%E6%83%B3%E7%AC%94%E8%AE%B0%20%E5%88%86%E6%9E%90%E5%92%8C%E8%AE%BE%E8%AE%A1/
+          </a>
+        </p>
+        <p><span style="font-weight: bold;">版权声明：</span>本博客所有文章除特别声明外，均采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0 协议</a>。转载请注明出处！</p>
+      </div>
+    
+  </div>
+</article>
+<div class="nav">
+  
+  
+    <div class="nav-item-next">
+      <a 
+        href="/2022/04/21/hello-world/" 
+        class="nav-link">
+        <div>
+          <div class="nav-label">下一篇</div>
+          
+            <div class="nav-title">Hello World </div>
+          
+        </div>
+        <i class="iconfont icon-right nav-next-icon"></i>
+      </a>
+    </div>
+  
+</div>
+
+<div 
+  class="card card-content toc-card" 
+  id="mobiletoc">
+  <div class="toc-header">
+  <i 
+    class="iconfont icon-menu" 
+    style="padding-right: 2px;">
+  </i>目录
+</div>
+<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#C-%E7%BC%96%E7%A8%8B%E6%80%9D%E6%83%B3%E7%AC%94%E8%AE%B0-%E5%88%86%E6%9E%90%E5%92%8C%E8%AE%BE%E8%AE%A1"><span class="toc-text">C++编程思想笔记 分析和设计</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC0%E9%98%B6%E6%AE%B5-%E5%88%B6%E5%AE%9A%E8%AE%A1%E5%88%92"><span class="toc-text">第0阶段 制定计划</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC1%E9%98%B6%E6%AE%B5-%E6%88%91%E4%BB%AC%E5%9C%A8%E5%81%9A%E4%BB%80%E4%B9%88"><span class="toc-text">第1阶段 我们在做什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E9%98%B6%E6%AE%B5-%E6%88%91%E4%BB%AC%E5%B0%86%E5%A6%82%E4%BD%95%E5%BB%BA%E7%AB%8B%E5%AF%B9%E8%B1%A1"><span class="toc-text">第二阶段 我们将如何建立对象</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%BA%94%E4%B8%AA%E9%98%B6%E6%AE%B5"><span class="toc-text">对象设计的五个阶段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E5%BC%80%E5%8F%91%E7%9A%84%E4%BA%94%E4%B8%AA%E5%87%86%E6%B5%8B"><span class="toc-text">对象开发的五个准测</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC3%E9%98%B6%E6%AE%B5%EF%BC%9A%E5%88%9B%E5%BB%BA%E6%A0%B8%E5%BF%83"><span class="toc-text">第3阶段：创建核心</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC4%E9%98%B6%E6%AE%B5-%E8%BF%AD%E4%BB%A3%E7%94%A8%E4%BE%8B"><span class="toc-text">第4阶段 迭代用例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC5%E9%98%B6%E6%AE%B5%EF%BC%9A%E8%BF%9B%E5%8C%96-%EF%BC%88%E7%BB%B4%E6%8A%A4%EF%BC%89"><span class="toc-text">第5阶段：进化 （维护）</span></a></li></ol></li></ol>
+</div></main>
+            <aside class="left-column">
+              
+              <div class="card card-author">
+                
+  <img 
+    src="https://ae01.alicdn.com/kf/Hfc15e2de394f4203a01a141c6889ad9a3.png" 
+    class="author-img"
+    width="88"
+    height="88"
+    alt="author avatar">
+
+<p class="author-name">墨樱</p>
+<p class="author-description">先斩了再说</p>
+<div class="author-message">
+  <a 
+    class="author-posts-count" 
+    href="/archives">
+    <span>2</span>
+    <span>文章</span>
+  </a>
+  <a 
+    class="author-categories-count" 
+    href="/categories">
+    <span>0</span>
+    <span>分类</span>
+  </a>
+  <a 
+    class="author-tags-count" 
+    href="/tags">
+    <span>2</span>
+    <span>标签</span>
+  </a>
+</div>
+
+              </div>
+               <div class="sticky-tablet">
+  
+  
+    <article class="display-when-two-columns spacer">
+      <div class="card card-content toc-card">
+        <div class="toc-header">
+  <i 
+    class="iconfont icon-menu" 
+    style="padding-right: 2px;">
+  </i>目录
+</div>
+<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#C-%E7%BC%96%E7%A8%8B%E6%80%9D%E6%83%B3%E7%AC%94%E8%AE%B0-%E5%88%86%E6%9E%90%E5%92%8C%E8%AE%BE%E8%AE%A1"><span class="toc-text">C++编程思想笔记 分析和设计</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC0%E9%98%B6%E6%AE%B5-%E5%88%B6%E5%AE%9A%E8%AE%A1%E5%88%92"><span class="toc-text">第0阶段 制定计划</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC1%E9%98%B6%E6%AE%B5-%E6%88%91%E4%BB%AC%E5%9C%A8%E5%81%9A%E4%BB%80%E4%B9%88"><span class="toc-text">第1阶段 我们在做什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E9%98%B6%E6%AE%B5-%E6%88%91%E4%BB%AC%E5%B0%86%E5%A6%82%E4%BD%95%E5%BB%BA%E7%AB%8B%E5%AF%B9%E8%B1%A1"><span class="toc-text">第二阶段 我们将如何建立对象</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%BA%94%E4%B8%AA%E9%98%B6%E6%AE%B5"><span class="toc-text">对象设计的五个阶段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E5%BC%80%E5%8F%91%E7%9A%84%E4%BA%94%E4%B8%AA%E5%87%86%E6%B5%8B"><span class="toc-text">对象开发的五个准测</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC3%E9%98%B6%E6%AE%B5%EF%BC%9A%E5%88%9B%E5%BB%BA%E6%A0%B8%E5%BF%83"><span class="toc-text">第3阶段：创建核心</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC4%E9%98%B6%E6%AE%B5-%E8%BF%AD%E4%BB%A3%E7%94%A8%E4%BE%8B"><span class="toc-text">第4阶段 迭代用例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC5%E9%98%B6%E6%AE%B5%EF%BC%9A%E8%BF%9B%E5%8C%96-%EF%BC%88%E7%BB%B4%E6%8A%A4%EF%BC%89"><span class="toc-text">第5阶段：进化 （维护）</span></a></li></ol></li></ol>
+      </div>
+    </article>
+  
+  
+  <article class="card card-content categories-widget">
+    <div class="categories-card">
+  <div class="categories-header">
+    <i 
+      class="iconfont icon-fenlei" 
+      style="padding-right: 2px;">
+    </i>分类
+  </div>
+  <div class="categories-list">
+    
+  </div>
+</div>
+  </article>
+  
+  <article class="card card-content tags-widget">
+    <div class="tags-card">
+  <div class="tags-header">
+    <i 
+      class="iconfont icon-biaoqian" 
+      style="padding-right: 2px;">
+    </i>热门标签
+  </div>
+  <div class="tags-list">
+    
+      <a 
+        href="/tags/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" 
+        title="面向对象">
+        <div class="tags-list-item">面向对象</div>
+      </a>
+    
+      <a 
+        href="/tags/C/" 
+        title="C++">
+        <div class="tags-list-item">C++</div>
+      </a>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+            </aside>
+            <aside class="right-column">
+              <div class="sticky-widescreen">
+  
+  
+    <article class="card card-content toc-card">
+      <div class="toc-header">
+  <i 
+    class="iconfont icon-menu" 
+    style="padding-right: 2px;">
+  </i>目录
+</div>
+<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#C-%E7%BC%96%E7%A8%8B%E6%80%9D%E6%83%B3%E7%AC%94%E8%AE%B0-%E5%88%86%E6%9E%90%E5%92%8C%E8%AE%BE%E8%AE%A1"><span class="toc-text">C++编程思想笔记 分析和设计</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC0%E9%98%B6%E6%AE%B5-%E5%88%B6%E5%AE%9A%E8%AE%A1%E5%88%92"><span class="toc-text">第0阶段 制定计划</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC1%E9%98%B6%E6%AE%B5-%E6%88%91%E4%BB%AC%E5%9C%A8%E5%81%9A%E4%BB%80%E4%B9%88"><span class="toc-text">第1阶段 我们在做什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E9%98%B6%E6%AE%B5-%E6%88%91%E4%BB%AC%E5%B0%86%E5%A6%82%E4%BD%95%E5%BB%BA%E7%AB%8B%E5%AF%B9%E8%B1%A1"><span class="toc-text">第二阶段 我们将如何建立对象</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%BA%94%E4%B8%AA%E9%98%B6%E6%AE%B5"><span class="toc-text">对象设计的五个阶段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E5%BC%80%E5%8F%91%E7%9A%84%E4%BA%94%E4%B8%AA%E5%87%86%E6%B5%8B"><span class="toc-text">对象开发的五个准测</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC3%E9%98%B6%E6%AE%B5%EF%BC%9A%E5%88%9B%E5%BB%BA%E6%A0%B8%E5%BF%83"><span class="toc-text">第3阶段：创建核心</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC4%E9%98%B6%E6%AE%B5-%E8%BF%AD%E4%BB%A3%E7%94%A8%E4%BE%8B"><span class="toc-text">第4阶段 迭代用例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC5%E9%98%B6%E6%AE%B5%EF%BC%9A%E8%BF%9B%E5%8C%96-%EF%BC%88%E7%BB%B4%E6%8A%A4%EF%BC%89"><span class="toc-text">第5阶段：进化 （维护）</span></a></li></ol></li></ol>
+    </article>
+  
+  
+  <article class="card card-content">
+    <div class="recent-posts-card">
+  <div class="recent-posts-header">
+    <i 
+      class="iconfont icon-wenzhang_huaban" 
+      style="padding-right: 2px;">
+    </i>最近文章
+  </div>
+  <div class="recent-posts-list">
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-04-21</div>
+        <a href="/2022/04/21/C++%E7%BC%96%E7%A8%8B%E6%80%9D%E6%83%B3%E7%AC%94%E8%AE%B0%20%E5%88%86%E6%9E%90%E5%92%8C%E8%AE%BE%E8%AE%A1/"><div class="recent-posts-item-content">C++编程思想笔记 分析和设计</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-04-21</div>
+        <a href="/2022/04/21/hello-world/"><div class="recent-posts-item-content">Hello World</div></a>
+      </div>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </div>
+     
+    <footer class="footer">
+  <div class="footer-container">
+    <div>
+      <div class="footer-dsc">
+        <span>
+          Copyright ©
+          
+            2020
+          
+          
+                - 
+                2022
+          
+        </span>
+        &nbsp;
+        <a 
+          href="/" 
+          class="footer-link">
+          墨樱's blog
+        </a>
+      </div>
+    </div>
+
+    
+      <div class="footer-dsc">
+        
+          Powered by
+          <a 
+            href="https://hexo.io/" 
+            class="footer-link" 
+            target="_blank" 
+            rel="nofollow noopener noreferrer">
+            &nbsp;Hexo
+          </a>
+        
+        
+          <span>&nbsp;|&nbsp;</span>
+        
+        
+          Theme -
+          <a 
+            href="https://github.com/theme-kaze" 
+            class="footer-link" 
+            target="_blank"
+            rel="nofollow noopener noreferrer">
+            &nbsp;Kaze
+          </a>
+        
+      </div>
+    
+    
+    
+    
+</footer>
+ 
+    
+  <a 
+    role="button" 
+    id="scrollbutton" 
+    class="basebutton" 
+    aria-label="回到顶部">
+    <i class="iconfont icon-arrowleft button-icon"></i>
+  </a>
+
+<a 
+  role="button" 
+  id="menubutton"
+  aria-label="menu button"
+  class="basebutton">
+  <i class="iconfont icon-menu button-icon"></i>
+</a>
+<a 
+  role="button" 
+  id="popbutton" 
+  class="basebutton" 
+  aria-label="控制中心">
+  <i class="iconfont icon-expand button-icon"></i>
+</a>
+<a 
+  role="button" 
+  id="darkbutton" 
+  class="basebutton darkwidget" 
+  aria-label="夜色模式">
+  <i class="iconfont icon-weather button-icon"></i>
+</a>
+<a 
+  role="button" 
+  id="searchbutton" 
+  class="basebutton searchwidget" 
+  aria-label="搜索">
+  <i class="iconfont icon-search button-icon"></i>
+</a> 
+     
+     
+     
+      <script>
+  var addImgLayout = function () {
+    var img = document.querySelectorAll('.post-content img')
+    var i
+    for (i = 0; i < img.length; i++) {
+      var wrapper = document.createElement('a')
+      wrapper.setAttribute('href', img[i].getAttribute('data-src'))
+      wrapper.setAttribute('aria-label', 'illustration')
+      wrapper.style.cssText =
+        'width: 100%; display: flex; justify-content: center;'
+      if (img[i].alt) wrapper.dataset.caption = img[i].alt
+      wrapper.dataset.nolink = true
+      img[i].before(wrapper)
+      wrapper.append(img[i])
+      var divWrap = document.createElement('div')
+      divWrap.classList.add('gallery')
+      wrapper.before(divWrap)
+      divWrap.append(wrapper)
+    }
+    baguetteBox.run('.gallery')
+  }
+</script>
+<script>
+  loadScript(
+    "/js/lib/lightbox/baguetteBox.min.js",
+    addImgLayout
+  )
+</script>
+ 
+     
+     
+    <script src="/js/main.js"></script> 
+     
+    
+      <script>
+        var addLazyload = function () {
+          var observer = lozad('.lozad', {
+            load: function (el) {
+              el.srcset = el.getAttribute('data-src')
+            },
+            loaded: function (el) {
+              el.classList.add('loaded')
+            },
+          })
+          observer.observe()
+        }
+      </script>
+      <script>
+        loadScript('/js/lib/lozad.min.js', addLazyload)
+      </script>
+     
+    
+    
+  </body>
+</html>
