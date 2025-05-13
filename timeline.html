@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>当前活跃交易品种 (UTC+8)</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            line-height: 1.6;
+            color: #333;
+            padding: 10px;
+            margin: 0;
+            background-color: #f8f8f8; /* Consistent with Notion light theme */
+        }
+        h1 {
+            font-size: 1.2em;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        .time-display {
+            font-size: 1em;
+            margin-bottom: 15px;
+            color: #666;
+        }
+        .active-instruments-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .active-instruments-list li {
+            background-color: #e9e9e9; /* Light background for active items */
+            border-left: 4px solid #007bff; /* Blue bar like Notion callout */
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+         .inactive-message {
+             font-style: italic;
+             color: #999;
+         }
+        .note {
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 20px;
+        }
+        .opportunity-time {
+            font-weight: normal;
+            font-size: 0.9em;
+            color: #555;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>当前活跃交易品种</h1>
+    <p class="time-display">当前时间 (UTC+8): <span id="current-time">-</span></p>
+
+    <div id="active-instruments">
+        <p>加载中...</p>
+    </div>
+
+    <p class="note">
+        说明：下方时间为东八区(UTC+8)的主要机会时段（高流动/高波动）。<br>
+        **夏令时**会影响欧美品种的开盘和收盘时间，通常会比非夏令时**提前一小时**。请根据当前季节手动调整判断或查阅交易平台时间。<br>
+        重要经济数据/新闻事件可能在非活跃时段引发行情。
+    </p>
+
+    <script>
+        // 将时间表示为从午夜开始的总分钟数，便于比较
+        function timeToMinutes(hour, minute) {
+            return hour * 60 + minute;
+        }
+
+        // 定义品种及其活跃时段 (UTC+8)
+        // 注意：这里包含的是主要机会时段，不是完整的交易时间
+        // 夏令时请根据备注手动判断
+        const instruments = [
+            { name: "外汇 Majors (EURUSD, GBPUSD等)", ranges: [ { start: timeToMinutes(15, 0), end: timeToMinutes(4, 0), nextDayEnd: true } ], note: "主要活跃于欧洲和北美盘，高峰 20:00-23:00" }, // 15:00 - 04:00 (次日)
+            { name: "美股指 (ES500/SPX500, US30/DJ30等)", ranges: [ { start: timeToMinutes(21, 30), end: timeToMinutes(5, 0), nextDayEnd: true } ], note: "跟随美股开盘。夏令时可能提前至 21:30 开盘；非夏令时 22:30 开盘，05:00 收盘。" }, // 21:30 或 22:30 - 04:00 或 05:00 (次日)
+            { name: "欧股指 (DE40/DAX40, UK100等)", ranges: [ { start: timeToMinutes(15, 0), end: timeToMinutes(1, 30), nextDayEnd: true } ], note: "跟随欧股开盘。夏令时可能从 15:00 开始；非夏令时 16:00 开始。" }, // 15:00 或 16:00 - 00:30 或 01:30 (次日)
+            { name: "JP225 (日经225)", ranges: [ { start: timeToMinutes(8, 0), end: timeToMinutes(10, 30) }, { start: timeToMinutes(11, 30), end: timeToMinutes(14, 0) } ], note: "东京股市交易时段" }, // 08:00-10:30 & 11:30-14:00
+            { name: "HK50 (恒生指数)", ranges: [ { start: timeToMinutes(9, 30), end: timeToMinutes(12, 0) }, { start: timeToMinutes(13, 0), end: timeToMinutes(16, 0) } ], note: "香港股市交易时段" }, // 09:30-12:00 & 13:00-16:00
+            { name: "AU200 (澳大利亚200)", ranges: [ { start: timeToMinutes(8, 0), end: timeToMinutes(14, 0) } ], note: "澳大利亚股市交易时段" }, // 08:00-14:00
+            { name: "黄金/白银 (XAUUSD/XAGUSD)", ranges: [ { start: timeToMinutes(15, 0), end: timeToMinutes(4, 0), nextDayEnd: true } ], note: "活跃于欧洲和北美盘，高峰 20:00-23:00" }, // 15:00 - 04:00 (次日)
+            { name: "原油 (WTI/Brent)", ranges: [ { start: timeToMinutes(15, 0), end: timeToMinutes(5, 0), nextDayEnd: true } ], note: "主要活跃于欧洲和北美盘。夏令时可能从 15:00 开始，非夏令时 16:00 开始。关注 EIA 数据（通常周三晚 22:30/23:30）。" }, // 15:00/16:00 - 04:00/05:00 (次日)
+        ];
+
+        function updateActiveInstruments() {
+            const now = new Date();
+            // 获取当前时间的东八区小时和分钟
+            // 这里假设运行代码的环境时区设置正确，或者与 UTC+8 偏移量一致
+            // 更严谨需要处理时区，但会增加复杂性
+            const currentUtcOffset = now.getTimezoneOffset(); // 获取本地时区与 UTC 的分钟差
+            const utcTime = new Date(now.getTime() + (currentUtcOffset * 60000)); // 转换为 UTC 时间
+            // 计算 UTC+8 时间
+            const utcPlus8Time = new Date(utcTime.getTime() + (8 * 60 * 60 * 1000));
+
+            const currentHour = utcPlus8Time.getHours();
+            const currentMinute = utcPlus8Time.getMinutes();
+            const currentTimeInMinutes = timeToMinutes(currentHour, currentMinute);
+
+            // 显示当前 UTC+8 时间
+            const paddedHour = currentHour < 10 ? '0' + currentHour : currentHour;
+            const paddedMinute = currentMinute < 10 ? '0' + currentMinute : currentMinute;
+            document.getElementById('current-time').textContent = `${paddedHour}:${paddedMinute}`;
+
+            const activeList = document.getElementById('active-instruments');
+            activeList.innerHTML = ''; // 清空列表
+
+            let anyActive = false;
+
+            instruments.forEach(instrument => {
+                let isCurrentlyActive = false;
+                instrument.ranges.forEach(range => {
+                    const start = range.start;
+                    const end = range.end;
+
+                    if (start <= end) { // 时段不跨越午夜
+                        if (currentTimeInMinutes >= start && currentTimeInMinutes <= end) {
+                            isCurrentlyActive = true;
+                        }
+                    } else { // 时段跨越午夜 (例如 21:30 到 04:00)
+                        if (currentTimeInMinutes >= start || currentTimeInMinutes <= end) {
+                             isCurrentlyActive = true;
+                        }
+                    }
+                });
+
+                if (isCurrentlyActive) {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = instrument.name;
+                    if (instrument.note) {
+                        const noteSpan = document.createElement('span');
+                        noteSpan.className = 'opportunity-time';
+                        noteSpan.textContent = ` (${instrument.note})`;
+                        listItem.appendChild(noteSpan);
+                    }
+                    activeList.appendChild(listItem);
+                    anyActive = true;
+                }
+            });
+
+            if (!anyActive) {
+                activeList.innerHTML = '<p class="inactive-message">当前没有品种处于主要活跃时段，但市场仍在运行。</p>';
+            }
+        }
+
+        // 页面加载后立即更新一次
+        updateActiveInstruments();
+
+        // 每分钟更新一次时间显示和活跃品种列表
+        setInterval(updateActiveInstruments, 60 * 1000); // 60000毫秒 = 1分钟
+
+    </script>
+
+</body>
+</html>
